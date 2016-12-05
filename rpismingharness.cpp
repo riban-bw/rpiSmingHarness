@@ -31,7 +31,9 @@ bool g_bVerbose = false;
 
 int main(int argc, char* argv[])
 {
+    RPIESP esp;
     unsigned int nMode = MODE_NONE;
+    string sConfFilename = "rpismingharness.conf";
     //Command line options - configure in this structure and getopt_long call in while loop
     static struct option long_options[] =
     {
@@ -42,11 +44,12 @@ int main(int argc, char* argv[])
         {"run", no_argument, 0, 'r'},
         {"flash", no_argument, 0, 'f'},
         {"powerdown", no_argument, 0, 'p'},
+        {"config", required_argument, 0, 'c'},
         {0,0,0,0}
     };
     int option_index = 0;
     int nAction = 0;
-    while((nAction = getopt_long(argc, argv, "hfprRvV", long_options, &option_index)) != -1)
+    while((nAction = getopt_long(argc, argv, "c:hfprRvV", long_options, &option_index)) != -1)
     {
         if(nAction == -1)
             break;
@@ -77,6 +80,7 @@ int main(int argc, char* argv[])
             case 'V':
                 //verbose
                 g_bVerbose = true;
+                esp.enableDebug();
                 break;
             case 'v':
                 cout << "Version "<< VERSION << endl;
@@ -85,13 +89,14 @@ int main(int argc, char* argv[])
             case 'p':
                 nMode = MODE_POWERDOWN;
                 break;
+            case 'c':
+                sConfFilename = optarg;
+                break;
             default:
                 break;
         }
 
     }
-    RPIESP esp;
-    esp.enableDebug();
     switch(nMode)
     {
         case MODE_RUN:
@@ -113,7 +118,7 @@ int main(int argc, char* argv[])
         return 0;
 
   ifstream file;
-  file.open("rpismingharness.conf");
+  file.open(sConfFilename.c_str());
   if(file.is_open())
   {
     if(g_bVerbose)
@@ -140,6 +145,11 @@ int main(int argc, char* argv[])
         esp.setPin(sParam, atoi(sValue.c_str()));
     }
     file.close();
+  }
+  else
+  {
+    if(g_bVerbose)
+      cout << "Failed to open configuration file '" << sConfFilename << "'" << endl;
   }
 
     return 0;
