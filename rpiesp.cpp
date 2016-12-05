@@ -4,6 +4,7 @@
 RPIESP::RPIESP()
 {
     m_bDebug = false;
+    m_bInit = false;
     m_mmPin["RESET"] = 27;
     m_mmPin["CH_PD"] = 25;
     m_mmPin["GPIO0"] = 23;
@@ -22,12 +23,13 @@ RPIESP::RPIESP()
 
 RPIESP::~RPIESP()
 {
+    bcm2835_close();
 }
 
 void RPIESP::enableDebug(bool enable)
 {
     m_bDebug = enable;
-
+    m_bInit = bcm2835_init();
 }
 
 bool RPIESP::setPin(string espPin, unsigned int rpiGPIO)
@@ -64,28 +66,51 @@ string RPIESP::getValidPins()
 
 void RPIESP::reset()
 {
+    if(!m_bInit)
+      return;
     //!@todo Implement reset
     if(m_bDebug)
       cout << "RPIESP::reset" << endl;
+    bcm2835_gpio_write(m_mmPin["RESET"], LOW);
+    bcm2835_delay(100);
+    bcm2835_gpio_write(m_mmPin["RESET"], HIGH);
 }
 
 void RPIESP::powerdown()
 {
+    if(!m_bInit)
+      return;
     //!@todo Implement powerdown
     if(m_bDebug)
       cout << "RPIESP::powerdown" << endl;
+    bcm2835_gpio_write(m_mmPin["CH_PD"], LOW);
 }
 
 void RPIESP::flash()
 {
+    if(!m_bInit)
+      return;
     //!@todo Implement flash
     if(m_bDebug)
       cout << "RPIESP::flash" << endl;
+    bcm2835_gpio_write(m_mmPin["RESET"], LOW);
+    bcm2835_gpio_write(m_mmPin["GPIO15"], LOW);
+    bcm2835_gpio_write(m_mmPin["GPIO2"], HIGH);
+    bcm2835_gpio_write(m_mmPin["GPIO0"], LOW);
+    bcm2835_gpio_write(m_mmPin["CH_PD"], HIGH);
+    bcm2835_delay(100);
+    bcm2835_gpio_write(m_mmPin["RESET"], HIGH);
 }
 
 void RPIESP::run()
 {
+    if(!m_bInit)
+      return;
     //!@todo Implement run
     if(m_bDebug)
       cout << "RPIESP::run" << endl;
+    bcm2835_gpio_write(m_mmPin["GPIO15"], LOW);
+    bcm2835_gpio_write(m_mmPin["GPIO2"], HIGH);
+    bcm2835_gpio_write(m_mmPin["GPIO0"], HIGH);
+    bcm2835_gpio_write(m_mmPin["CH_PD"], HIGH);
 }

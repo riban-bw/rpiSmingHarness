@@ -8,9 +8,13 @@
 
 #define VERSION "0.0.1"
 
-#include <iostream>
-#include <getopt.h>
 #include "rpiesp.h"
+#include <getopt.h>
+#include <stdlib.h>
+#include <iostream>
+#include <string>
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -107,5 +111,36 @@ int main(int argc, char* argv[])
     }
     if(nMode != MODE_NONE)
         return 0;
+
+  ifstream file;
+  file.open("rpismingharness.conf");
+  if(file.is_open())
+  {
+    if(g_bVerbose)
+      cout << "Opened configuration file" << endl;
+    string sLine, sSection;
+    while(getline(file, sLine))
+    {
+      sLine = sLine.substr(0, sLine.find('#'));
+      if(sLine[0] == '[')
+      {
+        sSection = sLine.substr(1, sLine.find(']') - 1);
+        if(g_bVerbose)
+          cout << "Found section '" << sSection << "'" << endl;
+        continue;
+      }
+      size_t nPos = sLine.find('=');
+      if(nPos == string::npos)
+        continue;
+      string sParam = sLine.substr(0, nPos);
+      string sValue = sLine.substr(nPos + 1);
+      sParam.erase(sParam.find_last_not_of(" \t") + 1); //trim
+      sValue.erase(0, sValue.find_last_not_of(" \t")); //trim
+      if(sSection == "PINS")
+        esp.setPin(sParam, atoi(sValue.c_str()));
+    }
+    file.close();
+  }
+
     return 0;
 }

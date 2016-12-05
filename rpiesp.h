@@ -48,5 +48,6 @@ class RPIESP
     protected:
     private:
         bool m_bDebug; //True to enable debug output
+        bool m_bInit; //True if bcm2835 library is initialised
         map<string,unsigned int> m_mmPin; //Map of ESP pin to RPi GPIO
 };
