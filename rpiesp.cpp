@@ -106,11 +106,21 @@ void RPIESP::run()
 {
     if(!m_bInit)
       return;
-    //!@todo Implement run
     if(m_bDebug)
       cout << "RPIESP::run" << endl;
     bcm2835_gpio_write(m_mmPin["GPIO15"], LOW);
     bcm2835_gpio_write(m_mmPin["GPIO2"], HIGH);
     bcm2835_gpio_write(m_mmPin["GPIO0"], HIGH);
+    bcm2835_delay(100);
     bcm2835_gpio_write(m_mmPin["CH_PD"], HIGH);
+}
+
+void RPIESP::out(string espPin, unsigned int value)
+{
+    if(!m_bInit)
+      return;
+  
+    if(m_mmPin.end() == m_mmPin.find(espPin))
+      return;
+    bcm2835_gpio_write(m_mmPin[espPin], value);
 }

@@ -45,6 +45,12 @@ class RPIESP
         */
         string getValidPins();
 
+        /** @brief  Set a GPIO output value
+        *   @param  espPin Name of the ESP module pin
+        *   @param  value Value to set pin to [LOW | HIGH]
+        */
+        void out(string espPin, unsigned int value);
+
     protected:
     private:
         bool m_bDebug; //True to enable debug output

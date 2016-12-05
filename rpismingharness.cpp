@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
       string sParam = sLine.substr(0, nPos);
       string sValue = sLine.substr(nPos + 1);
       sParam.erase(sParam.find_last_not_of(" \t") + 1); //trim
-      sValue.erase(0, sValue.find_last_not_of(" \t")); //trim
+      sValue.erase(0, sValue.find_first_not_of(" \t")); //trim
       if(sSection == "PINS")
         esp.setPin(sParam, atoi(sValue.c_str()));
     }
