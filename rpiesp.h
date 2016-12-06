@@ -5,6 +5,8 @@
 
 using namespace std;
 
+static const int RPIESP_NOTFOUND = -1;
+
 class RPIESP
 {
     public:
@@ -56,4 +58,5 @@ class RPIESP
         bool m_bDebug; //True to enable debug output
         bool m_bInit; //True if bcm2835 library is initialised
         map<string,unsigned int> m_mmPin; //Map of ESP pin to RPi GPIO
+        map<unsigned int,unsigned int> m_mmBCM2835Pin; //Map of RPi GPIO to BCM2835 pin
 };
