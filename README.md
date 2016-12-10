@@ -2,6 +2,7 @@
 A test harness for the Sming framework running on a Raspberry Pi
 # Current status: Alpha
 There is very limited functionality currently implemented. Simple control of the ESP module is implemented, e.g. reset, boot in flash mode, power down, etc. Not much else yet. (Early days!)
+
 |Requirement|Status|
 |-----------|------|
 |Application wire frame|X|
