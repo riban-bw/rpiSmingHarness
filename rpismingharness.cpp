@@ -10,13 +10,15 @@
 
 #include "rpismingharness.h"
 #include "rpiesp.h"
+#include "logger.h"
 #include <getopt.h>
 #include <stdlib.h>
 #include <iostream>
 #include <string>
-#include <iostream>
-#include <fstream>
-#include <ctime>
+#include <stdarg.h> //provides va_* functions
+#include <fstream> //provides fopen, etc.
+#include <ctime> //provides time functions
+#include <unistd.h> //provides sleep
 
 using namespace std;
 
@@ -32,7 +34,7 @@ enum MODE
 };
 
 bool g_bVerbose = false;
-ofstream g_fileLog;
+Logger g_logger("rpismingharness.log");
 
 int main(int argc, char* argv[])
 {
@@ -41,7 +43,6 @@ int main(int argc, char* argv[])
     unsigned int nTestMax = 2;
     unsigned int nMode = MODE_NONE;
     string sConfFilename = "rpismingharness.conf";
-    string sLogFilename = "rpismingharness.log";
     //Command line options - configure in this structure and getopt_long call in while loop
     static struct option long_options[] =
     {
@@ -163,42 +164,28 @@ int main(int argc, char* argv[])
       cout << "Failed to open configuration file '" << sConfFilename << "'" << endl;
   }
 
-  g_fileLog.open(sLogFilename.c_str());
   if(nTest !=0)
   {
       return runTest(nTest);
   }
   bool bFail = false;
   for(unsigned int nTest = 0; nTest < nTestMax; ++nTest)
-    bFail != runTest(nTest);
+    bFail |= runTest(nTest);
 
     if(g_bVerbose)
+    {
         if(bFail)
             cout << "Some tests failed!" << endl;
         else
             cout << "All tests passed." << endl;
-    g_fileLog.close();
+    }
     return bFail?-1:0;
 }
 
 bool runTest(unsigned int test)
 {
     //!@todo Implement runTest
-    log("Running test #"); //!@todo format log message to show which test
+    g_logger.print("Running test %d", test);
     return false;
 }
 
-void log(std::string message, bool timestamp)
-{
-    if(!g_fileLog.is_open())
-        return;
-    if(timestamp)
-    {
-        time_t now = time(NULL);
-        tm * ptm = localtime(&now);
-        char timestamp[32];
-        strftime(timestamp, 32, "%H:%M:%S %Y-%m-%d\t", ptm);
-        g_fileLog << timestamp;
-    }
-    g_fileLog << message << endl;
-}
