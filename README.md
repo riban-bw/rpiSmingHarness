@@ -29,7 +29,7 @@ rpiSmingHarness is designed to interface with an ESP-12 module which exposes the
 |GPIO0 |GPIO23|      |
 |GPIO1 |GPIO15|RxD   |
 |GPIO2 |GPIO22|      |
-|GPIO3 |GPIO15|TxD   |
+|GPIO3 |GPIO14|TxD   |
 |GPIO4 |GPIO0 |      |
 |GPIO5 |GPIO1 |      |
 |GPIO12|GPIO10|      |

@@ -35,13 +35,13 @@ enum MODE
 
 bool g_bVerbose = false;
 Logger g_logger("rpismingharness.log");
+RPIESP esp;
 
 int main(int argc, char* argv[])
 {
-    RPIESP esp;
     unsigned int nTest = 0;
     unsigned int nTestMax = 2;
-    unsigned int nMode = MODE_NONE;
+    unsigned int nMode = MODE_TEST;
     string sConfFilename = "rpismingharness.conf";
     //Command line options - configure in this structure and getopt_long call in while loop
     static struct option long_options[] =
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     };
     int option_index = 0;
     int nAction = 0;
-    while((nAction = getopt_long(argc, argv, "c:hfprRtvV", long_options, &option_index)) != -1)
+    while((nAction = getopt_long(argc, argv, "c:hfprRt:vV", long_options, &option_index)) != -1)
     {
         if(nAction == -1)
             break;
@@ -128,7 +128,47 @@ int main(int argc, char* argv[])
     }
     if(nMode != MODE_TEST)
         return 0;
-
+/*
+    esp.mode("RESET", RPIGPIO_INPUT);
+    esp.mode("CH_PD", RPIGPIO_INPUT);
+    esp.mode("GPIO0", RPIGPIO_INPUT);
+    esp.mode("GPIO1", RPIGPIO_INPUT);
+    esp.mode("GPIO2", RPIGPIO_INPUT);
+    esp.mode("GPIO3", RPIGPIO_INPUT);
+    esp.mode("GPIO4", RPIGPIO_INPUT);
+    esp.mode("GPIO5", RPIGPIO_INPUT);
+    esp.mode("GPIO12", RPIGPIO_INPUT);
+    esp.mode("GPIO13", RPIGPIO_INPUT);
+    esp.mode("GPIO14", RPIGPIO_INPUT);
+    esp.mode("GPIO15", RPIGPIO_INPUT);
+    esp.mode("GPIO16", RPIGPIO_INPUT);
+    esp.out("RESET", LOW);
+    esp.out("CH_PD", LOW);
+    esp.out("GPIO0", LOW);
+    esp.out("GPIO1", LOW);
+    esp.out("GPIO2", LOW);
+    esp.out("GPIO3", LOW);
+    esp.out("GPIO4", LOW);
+    esp.out("GPIO5", LOW);
+    esp.out("GPIO12", LOW);
+    esp.out("GPIO13", LOW);
+    esp.out("GPIO14", LOW);
+    esp.out("GPIO15", LOW);
+    esp.out("GPIO16", LOW);
+    esp.in("RESET");
+    esp.in("CH_PD");
+    esp.in("GPIO0");
+    esp.in("GPIO1");
+    esp.in("GPIO2");
+    esp.in("GPIO3");
+    esp.in("GPIO4");
+    esp.in("GPIO5");
+    esp.in("GPIO12");
+    esp.in("GPIO13");
+    esp.in("GPIO14");
+    esp.in("GPIO15");
+    esp.in("GPIO16");
+*/
   ifstream file;
   file.open(sConfFilename.c_str());
   if(file.is_open())
@@ -182,10 +222,50 @@ int main(int argc, char* argv[])
     return bFail?-1:0;
 }
 
+#include <sstream>
 bool runTest(unsigned int test)
 {
     //!@todo Implement runTest
     g_logger.print("Running test %d", test);
+
+    ostringstream ss;
+    ss << test;
+    string sGPIO = "GPIO" + ss.str();
+    if(test == 20)
+        sGPIO = "RESET";
+    if(test == 21)
+        sGPIO == "CH_PD";
+    switch(test)
+    {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+        case 20:
+        case 21:
+            cout << "Flashing " << sGPIO << endl;
+            while(true)
+            {
+                esp.out(sGPIO, LOW);
+                cout << "0 ";
+                sleep(1);
+                esp.out(sGPIO, HIGH);
+                cout << "1 ";
+                sleep(1);
+            }
+            break;
+        case 22:
+            esp.enableUart();
+        default:
+            break;
+    }
     return false;
 }
 
