@@ -32,7 +32,7 @@ $(TARGET): $(OBJ)
 
 obj/%.o: %.cpp
 	$Q echo [Compile] $<
-	-$Q mkdir obj
+	-$Q mkdir -p obj
 	$Q $(CC) -c $(CFLAGS) $<  -o $@
 
 clean:
