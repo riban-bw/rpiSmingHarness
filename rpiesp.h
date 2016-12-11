@@ -87,5 +87,4 @@ class RPIESP
         bool m_bDebug; //True to enable debug output
         bool m_bInit; //True if bcm2835 library is initialised
         map<string,unsigned int> m_mmPin; //Map of ESP module functions to BCM2835 pins: m_mmPin[ESP Function] = BCM2835 pin
-        map<unsigned int,unsigned int> m_mmBCM2835Pin; //Map of RPi GPIO to BCM2835 pins: m_mmBCM2835Pin[RPi GPIO#] = BCM2385 pin
 };

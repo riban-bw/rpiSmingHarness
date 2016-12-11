@@ -19,24 +19,6 @@ RPIESP::RPIESP()
     m_mmPin["GPIO15"]   = 8;
     m_mmPin["GPIO16"]   = 4;
     m_mmPin["ADC"]      = 18;
-    //Map RPi GPIO to BCM2835 pins: m_mmBCM2835Pin[RPi GPIO#] = BCM2385 pin
-    m_mmBCM2835Pin[2] = 2;
-    m_mmBCM2835Pin[3] = 3;
-    m_mmBCM2835Pin[4] = 4;
-    m_mmBCM2835Pin[7] = 7;
-    m_mmBCM2835Pin[8] = 8;
-    m_mmBCM2835Pin[9] = 9;
-    m_mmBCM2835Pin[10] = 10;
-    m_mmBCM2835Pin[11] = 11;
-    m_mmBCM2835Pin[14] = 14;
-    m_mmBCM2835Pin[15] = 15;
-    m_mmBCM2835Pin[17] = 17;
-    m_mmBCM2835Pin[18] = 18;
-    m_mmBCM2835Pin[22] = 22;
-    m_mmBCM2835Pin[23] = 23;
-    m_mmBCM2835Pin[24] = 24;
-    m_mmBCM2835Pin[25] = 25;
-    m_mmBCM2835Pin[27] = 27;
 }
 
 RPIESP::~RPIESP()
@@ -51,14 +33,8 @@ void RPIESP::enableDebug(bool enable)
 
 bool RPIESP::setPin(string espPin, unsigned int rpiGPIO)
 {
-    map<unsigned int, unsigned int>::iterator it = m_mmBCM2835Pin.find(rpiGPIO);
-    if(m_mmBCM2835Pin.end() == it)
-    {
-        if(m_bDebug)
-            cerr << "Failed to set ESP pin '" << espPin << "' to RPi 'GPIO" << rpiGPIO << "'- invalid RPi GPIO." << endl;
-        return false;
-    }
-    if(m_mmPin.end() == m_mmPin.find(espPin))
+    map<string, unsigned int>::iterator it = m_mmPin.find(espPin);
+    if(m_mmPin.end() == it)
     {
         if(m_bDebug)
             cerr << "Failed to set ESP pin '" << espPin << "' to RPi 'GPIO" << rpiGPIO << " - invalid ESP pin. Valid ESP pins are: " << getValidPins() << endl;
@@ -116,12 +92,13 @@ void RPIESP::run()
 {
     if(m_bDebug)
         cerr << "RPIESP::run" << endl;
-    out("CH_PD", LOW);
+    out("RESET", LOW);
     out("GPIO15", LOW);
     out("GPIO2", HIGH);
     out("GPIO0", HIGH);
-    bcm2835_delay(100);
     out("CH_PD", HIGH);
+    bcm2835_delay(100);
+    out("RESET", HIGH);
 }
 
 void RPIESP::out(string espPin, unsigned int value)
@@ -129,9 +106,9 @@ void RPIESP::out(string espPin, unsigned int value)
     unsigned int nPin = getPin(espPin);
     if(nPin == BCM_NOT_FOUND)
         return;
+    mode(espPin, RPIGPIO_OUTPUT);
     if(m_bDebug)
       cerr << "RPIESP::out - setting ESP module '" << espPin << "' (BCM2835 Pin " << nPin << ") to value " << value << endl;
-    mode(espPin, RPIGPIO_OUTPUT);
     bcm2835_gpio_write(nPin, value);
 }
 
@@ -160,7 +137,7 @@ unsigned int RPIESP::getPin(string espPin)
 {
     if(!m_bInit)
     {
-        cerr << "RPIESP not initialised." << endl;
+        cerr << "RPIESP not initialised" << endl;
         return BCM_NOT_FOUND;
     }
     if(m_mmPin.end() == m_mmPin.find(espPin))
@@ -173,6 +150,8 @@ unsigned int RPIESP::getPin(string espPin)
 
 void RPIESP::enableUart()
 {
+    if(m_bDebug)
+        cerr << "RPIESP::enableUart" << endl;
     bcm2835_gpio_fsel(14, BCM2835_GPIO_FSEL_ALT0);
     bcm2835_gpio_fsel(15, BCM2835_GPIO_FSEL_ALT0);
 }
