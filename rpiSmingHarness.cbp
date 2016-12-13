@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="rpiSmingHarness" />
+		<Option pch_mode="2" />
+		<Option compiler="rpi" />
+		<MakeCommands>
+			<Build command="$make -f $makefile $target" />
+			<CompileFile command="$make -f $makefile $file" />
+			<Clean command="$make -f $makefile clean" />
+			<DistClean command="$make -f $makefile distclean$target" />
+			<AskRebuildNeeded command="$make -q -f $makefile $target" />
+			<SilentBuild command="$make -f $makefile $target &gt; $(CMD_NULL)" />
+		</MakeCommands>
+		<Build>
+			<Target title="all">
+				<Option output="bin/rpiSmingHarness" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj" />
+				<Option type="1" />
+				<Option compiler="rpi" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+				<MakeCommands>
+					<Build command="$make -f $makefile $target" />
+					<CompileFile command="$make -f $makefile $file" />
+					<Clean command="$make -f $makefile clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -f $makefile $target &gt; $(CMD_NULL)" />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="../include" />
+		</Compiler>
+		<Linker>
+			<Add library="bcm2835" />
+			<Add directory="../lib" />
+		</Linker>
+		<Unit filename="LICENSE" />
+		<Unit filename="Makefile">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="README.md" />
+		<Unit filename="logger.cpp" />
+		<Unit filename="logger.h" />
+		<Unit filename="rpiesp.cpp" />
+		<Unit filename="rpiesp.h" />
+		<Unit filename="rpismingharness.conf" />
+		<Unit filename="rpismingharness.cpp" />
+		<Unit filename="rpismingharness.h" />
+		<Unit filename="uart.cpp" />
+		<Unit filename="uart.h" />
+		<Unit filename="unittest.cpp" />
+		<Unit filename="unittest.h" />
+		<Unit filename="utestgpi.cpp" />
+		<Unit filename="utestgpi.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
