@@ -9,7 +9,13 @@ using namespace std;
 typedef enum
 {
     RPIGPIO_INPUT   = BCM2835_GPIO_FSEL_INPT,
-    RPIGPIO_OUTPUT  = BCM2835_GPIO_FSEL_OUTP
+    RPIGPIO_OUTPUT  = BCM2835_GPIO_FSEL_OUTP,
+    RPIGPIO_ALT0    = BCM2835_GPIO_FSEL_ALT0,
+    RPIGPIO_ALT1    = BCM2835_GPIO_FSEL_ALT1,
+    RPIGPIO_ALT2    = BCM2835_GPIO_FSEL_ALT2,
+    RPIGPIO_ALT3    = BCM2835_GPIO_FSEL_ALT3,
+    RPIGPIO_ALT4    = BCM2835_GPIO_FSEL_ALT4,
+    RPIGPIO_ALT5    = BCM2835_GPIO_FSEL_ALT5
 } GPIOMODE;
 
 static const unsigned int BCM_NOT_FOUND = 9999;
@@ -57,12 +63,14 @@ class RPIESP
         /** @brief  Set a GPIO output value
         *   @param  espPin Name of the ESP module pin
         *   @param  value Value to set pin to [LOW | HIGH]
+        *   @note   Sets pin mode to output
         */
         void out(string espPin, unsigned int value);
 
         /** @brief  Get a GPIO input value
         *   @param  espPin Name of the ESP module pin
         *   @return <i>uint8_t</i> Input value [LOW | HIGH]
+        *   @note   Sets pin mode to input
         */
         uint8_t in(string espPin);
 
@@ -81,6 +89,12 @@ class RPIESP
         /** @brief  Configure GPIO 14 & 15 as UART
         */
         void enableUart();
+
+        /** @brief  Sets the value of the PWM output on RPi GPIO18
+        *   @param  value Output value [0-1023]
+        *   @note   PWM output is at 1172Hz
+        */
+        void setPwm(unsigned int value);
 
     protected:
     private:

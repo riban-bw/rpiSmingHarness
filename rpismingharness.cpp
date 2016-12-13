@@ -19,6 +19,7 @@
 #include <fstream> //provides fopen, etc.
 #include <ctime> //provides time functions
 #include <unistd.h> //provides sleep
+#include <sstream> //provides ostringstream
 
 using namespace std;
 
@@ -128,47 +129,7 @@ int main(int argc, char* argv[])
     }
     if(nMode != MODE_TEST)
         return 0;
-/*
-    esp.mode("RESET", RPIGPIO_INPUT);
-    esp.mode("CH_PD", RPIGPIO_INPUT);
-    esp.mode("GPIO0", RPIGPIO_INPUT);
-    esp.mode("GPIO1", RPIGPIO_INPUT);
-    esp.mode("GPIO2", RPIGPIO_INPUT);
-    esp.mode("GPIO3", RPIGPIO_INPUT);
-    esp.mode("GPIO4", RPIGPIO_INPUT);
-    esp.mode("GPIO5", RPIGPIO_INPUT);
-    esp.mode("GPIO12", RPIGPIO_INPUT);
-    esp.mode("GPIO13", RPIGPIO_INPUT);
-    esp.mode("GPIO14", RPIGPIO_INPUT);
-    esp.mode("GPIO15", RPIGPIO_INPUT);
-    esp.mode("GPIO16", RPIGPIO_INPUT);
-    esp.out("RESET", LOW);
-    esp.out("CH_PD", LOW);
-    esp.out("GPIO0", LOW);
-    esp.out("GPIO1", LOW);
-    esp.out("GPIO2", LOW);
-    esp.out("GPIO3", LOW);
-    esp.out("GPIO4", LOW);
-    esp.out("GPIO5", LOW);
-    esp.out("GPIO12", LOW);
-    esp.out("GPIO13", LOW);
-    esp.out("GPIO14", LOW);
-    esp.out("GPIO15", LOW);
-    esp.out("GPIO16", LOW);
-    esp.in("RESET");
-    esp.in("CH_PD");
-    esp.in("GPIO0");
-    esp.in("GPIO1");
-    esp.in("GPIO2");
-    esp.in("GPIO3");
-    esp.in("GPIO4");
-    esp.in("GPIO5");
-    esp.in("GPIO12");
-    esp.in("GPIO13");
-    esp.in("GPIO14");
-    esp.in("GPIO15");
-    esp.in("GPIO16");
-*/
+
   ifstream file;
   file.open(sConfFilename.c_str());
   if(file.is_open())
@@ -222,7 +183,6 @@ int main(int argc, char* argv[])
     return bFail?-1:0;
 }
 
-#include <sstream>
 bool runTest(unsigned int test)
 {
     //!@todo Implement runTest

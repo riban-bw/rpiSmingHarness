@@ -117,6 +117,7 @@ uint8_t RPIESP::in(string espPin)
     unsigned int nPin = getPin(espPin);
     if(nPin == BCM_NOT_FOUND)
         return 0;
+    mode(espPin, RPIGPIO_INPUT);
     uint8_t nValue = bcm2835_gpio_lev(nPin);
     if(m_bDebug)
       cerr << "RPIESP::in - ESP module '" << espPin << "' (BCM2835 Pin " << nPin << ") has value " << (int)nValue << endl;
@@ -154,4 +155,15 @@ void RPIESP::enableUart()
         cerr << "RPIESP::enableUart" << endl;
     bcm2835_gpio_fsel(14, BCM2835_GPIO_FSEL_ALT0);
     bcm2835_gpio_fsel(15, BCM2835_GPIO_FSEL_ALT0);
+}
+
+void RPIESP::setPwm(unsigned int value)
+{
+    if(m_bDebug)
+        cerr << "RPIESP::setPwm" << endl;
+    bcm2835_gpio_fsel(18, BCM2835_GPIO_FSEL_ALT5);
+    bcm2835_pwm_set_clock(BCM2835_PWM_CLOCK_DIVIDER_16); //19.2MHz / 16 = 1.2MHz
+    bcm2835_pwm_set_mode(0, 1, 1); //Enable PWM channel 0 in mark/space mode (set 2nd param to 0 to use balanced mode)
+    bcm2835_pwm_set_range(0, 1024); //1024 steps: 1.2MHz / 1024 = 1.17KHz
+    bcm2835_pwm_set_data(0, (value < 1024)?value:1023); //Set data value, limiting to 1023 max.
 }
