@@ -10,74 +10,77 @@
 #include <string>
 #include <sstream> //provides ostringstream
 
+static const unsigned int PINS[] = {0,1,2,3,4,5,12,13,14,15,16,20,21}; //ESP GPIO pins
+
 UTestGPI::UTestGPI(RPIESP* esp) :
     UnitTest::UnitTest(esp)
 {
     m_sName = "GPI";
+    //This feels messy. We have to fully qualify the function, get its address then cast it as type (TestStep) before passing to AddStep().
+    //It feels like there should be a simpler method (without resorting to macros).
+    AddStep((TestStep)(&UTestGPI::Step1));
+    AddStep((TestStep)(&UTestGPI::Step2));
 }
 
 UTestGPI::~UTestGPI()
 {
 }
 
-bool UTestGPI::RunTest(unsigned int test)
+bool UTestGPI::Step1()
 {
-    unsigned int pins[] = {0,1,2,3,4,5,12,13,14,15,16,20,21};
+    ostringstream ss;
+    for(unsigned int nIndex = 0; nIndex < 13; ++nIndex)
+    {
+        ss << PINS[nIndex];
+        string sGPIO = "GPIO" + ss.str();
+        m_pEsp->out(sGPIO, HIGH);
+        sleep(1);
+        m_pEsp->out(sGPIO, LOW);
+        sleep(1);
+        m_pEsp->enableUart();
+    }
+    return true; //!@todo get result from ESP module
+}
+
+bool UTestGPI::Step2()
+{
+    bool bPass = true;
     ostringstream ss;
     unsigned int nCount;
-    switch(test)
+    for(unsigned int nIndex = 0; nIndex < 13; ++nIndex)
     {
-        case 1:
-            for(unsigned int nIndex = 0; nIndex < 13; ++nIndex)
+        ss << PINS[nIndex];
+        string sGPIO = "GPIO" + ss.str();
+        //Wait for up to 1 second for pin to go high
+        nCount = 0;
+        while(m_pEsp->in(sGPIO) != HIGH)
+        {
+            if(nCount++ > 10) //poll for transition every 100ms
             {
-                ss << pins[nIndex];
-                string sGPIO = "GPIO" + ss.str();
-                m_pEsp->out(sGPIO, HIGH);
-                sleep(1);
-                m_pEsp->out(sGPIO, LOW);
-                sleep(1);
-                m_pEsp->enableUart();
+                //Timed out waiting so fail and break out of while loop
+                bPass = false;
+                break;
             }
-            break;
-        case 2:
-            for(unsigned int nIndex = 0; nIndex < 13; ++nIndex)
+            usleep(10000);
+        }
+        if(!bPass)
+        {
+            //!@todo log failure
+            break; //previous step failed so break out of for loop
+        }
+        //Wait for up to 1 second for pin to go low
+        nCount = 0;
+        while(m_pEsp->in(sGPIO) != LOW)
+        {
+                //Timed out waiting so fail and break out of while loop
+            if(nCount++ > 10) //poll for transition every 100ms
             {
-                ss << pins[nIndex];
-                string sGPIO = "GPIO" + ss.str();
-                //Wait for up to 1 second for pin to go high
-                nCount = 0;
-                while(m_pEsp->in(sGPIO) != HIGH)
-                {
-                    if(nCount++ > 10) //poll for transition every 100ms
-                    {
-                        //Timed out waiting so fail and break out of while loop
-                        m_bPass = false;
-                        break;
-                    }
-                    usleep(10000);
-                }
-                if(!m_bPass)
-                {
-                    //!@todo log failure
-                    break; //previous test stage failed so break out of for loop
-                }
-                //Wait for up to 1 second for pin to go low
-                nCount = 0;
-                while(m_pEsp->in(sGPIO) != LOW)
-                {
-                        //Timed out waiting so fail and break out of while loop
-                    if(nCount++ > 10) //poll for transition every 100ms
-                    {
-                        m_bPass = false;
-                        break;
-                    }
-                    usleep(10000);
-                }
+                bPass = false;
+                break;
             }
-            m_pEsp->enableUart();
-            break;
-        default:
-            ;
+            usleep(10000);
+        }
     }
-    return true;
+    m_bPass &= bPass;
+    return bPass;
 }

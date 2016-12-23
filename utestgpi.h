@@ -11,8 +11,8 @@
 using namespace std;
 
 /** GPI Unit Test
-*   Test 1: Asserts for 1s then clears for 1s each GPIO pin, one at a time, starting with lowest index.
-*   Test 2: Monitors GPIO pins, expecting each to be asserted for 1s then cleared for 1s, starting with lowest index.
+*   Step 1: Asserts for 1s then clears for 1s each GPIO pin, one at a time, starting with lowest index.
+*   Step 2: Monitors GPIO pins, expecting each to be asserted for 1s then cleared for 1s, starting with lowest index.
 *   @note   Serial port is unavailable during (part) of this test. Serial port is restored at end of each test
 */
 class UTestGPI : public UnitTest
@@ -21,13 +21,11 @@ class UTestGPI : public UnitTest
         UTestGPI(RPIESP* esp);
         virtual ~UTestGPI();
 
-        /** @brief  Runs specified test
-        *   @param  test Index of the test to run [0,1,...] (Default: 0 (first test))
-        *   @return <i>bool</i> True on success
-        */
-        bool RunTest(unsigned int test = 0);
-
     protected:
 
     private:
+        static const unsigned int UTEST_ID = 1; //Unit Test ID - should this be defined by the main application?
+//        static const unsigned int PINS[] = {0,1,2,3,4,5,12,13,14,15,16,20,21};
+        bool Step1(); //First step
+        bool Step2(); //Second step
 };

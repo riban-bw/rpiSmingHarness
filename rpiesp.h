@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <bcm2835.h>
+#include "uart.h"
 
 using namespace std;
 
@@ -96,9 +97,44 @@ class RPIESP
         */
         void setPwm(unsigned int value);
 
+        /** @brief  Wait up to 10s for ESP module to complete initialisation (expect "RPiSmingHarness READY" to be last message)
+        *   @return <i>bool</i> True if"RPiSmingHarness READDY" received within 10s
+        *   @note   Checks ten times, once every second. Blocks until success or timeout
+        */
+        bool waitReady();
+
+        /** @brief  Send command to ESP module
+        *   @param  command The command to send
+        *   @return <i>bool</i> True on success
+        */
+        bool sendCommand(unsigned char command);
+
+        /** @brief  Send string to ESP module
+        *   @param  message The string to send
+        *   @return <i>bool</i> True on success
+        */
+        bool sendMessage(string message);
+
+        /** @brief  Wait up to 1 second for an acknowledment message on serial port
+        *   @return <i>bool</i> True if ACK recieved within one second
+        *   @note   Checks 10 times, once each 100ms
+        */
+        bool getAck();
+
+        /** @brief  Get a pointer to the UART
+        *   @return <i>UART*</i> Pointer to UART object
+        *   @note   Allows parent class to share UART and access UART functions directly
+        *   @note   RPIESP class opens and closes UART - do not assume it will be in same state as last used.
+        *   @note   This function allows setting of UART configuration, e.g. baud
+        */
+        UART* getUart();
+
     protected:
     private:
+        bool openUart(unsigned int baud = 9600, unsigned int bits = 8, PARITY parity = EVEN, unsigned int stop = 1); //Opens the serial port. Returns true on success
+        void closeUart(); //Closes the serial port.
         bool m_bDebug; //True to enable debug output
         bool m_bInit; //True if bcm2835 library is initialised
         map<string,unsigned int> m_mmPin; //Map of ESP module functions to BCM2835 pins: m_mmPin[ESP Function] = BCM2835 pin
+        UART m_uart; //Serial port
 };

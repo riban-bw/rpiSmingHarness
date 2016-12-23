@@ -1,4 +1,5 @@
 #include "rpiesp.h"
+#include <unistd.h> //provides sleep
 
 RPIESP::RPIESP()
 {
@@ -24,6 +25,7 @@ RPIESP::RPIESP()
 RPIESP::~RPIESP()
 {
     bcm2835_close();
+    m_uart.Close();
 }
 
 void RPIESP::enableDebug(bool enable)
@@ -166,4 +168,74 @@ void RPIESP::setPwm(unsigned int value)
     bcm2835_pwm_set_mode(0, 1, 1); //Enable PWM channel 0 in mark/space mode (set 2nd param to 0 to use balanced mode)
     bcm2835_pwm_set_range(0, 1024); //1024 steps: 1.2MHz / 1024 = 1.17KHz
     bcm2835_pwm_set_data(0, (value < 1024)?value:1023); //Set data value, limiting to 1023 max.
+}
+
+bool RPIESP::waitReady()
+{
+    if(!m_uart.Open())
+        return false;
+    char START_MSG[] = "RPiSmingHarness READY";
+    unsigned int nCursor = 0;
+    bool bReady = false;
+
+    for(unsigned int nCount = 0; nCount < 10; ++nCount)
+    {
+        //flush serial port for 10 seconds
+        unsigned char a;
+        while(m_uart.Read(&a, 1) > 0)
+        {
+            if(a != START_MSG[nCursor++])
+                nCursor = 0;
+            if(nCursor > sizeof(START_MSG))
+                bReady = true;
+            if(bReady)
+                break;
+        }
+        if(bReady)
+            break;
+        sleep(1);
+    }
+    m_uart.Close();
+    return bReady;
+}
+
+bool RPIESP::sendCommand(unsigned char command)
+{
+    if(!m_uart.Open())
+        return false;
+    m_uart.Send(command);
+    return getAck();
+}
+
+bool RPIESP::sendMessage(string message)
+{
+    if(!m_uart.Open())
+        return false;
+    m_uart.Send((unsigned char*)message.c_str(), message.size());
+    return getAck();
+}
+
+bool RPIESP::getAck()
+{
+    if(!m_uart.Open())
+        return false;
+    bool bAck = false;
+    for(unsigned int nCount = 0; nCount < 10; ++nCount)
+    {
+        unsigned char a;
+        usleep(100000);
+        if(m_uart.Read(&a, 1) < 1)
+            continue;
+        if(a != UART::ACK)
+            continue;
+        bAck = true;
+        break;
+    }
+    return bAck;
+    m_uart.Close();
+}
+
+UART* RPIESP::getUart()
+{
+    return &m_uart;
 }

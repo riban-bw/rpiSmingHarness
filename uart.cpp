@@ -53,6 +53,8 @@ void UART::SetStop(unsigned int stop)
 
 bool UART::Open(unsigned int baud, unsigned int bits, PARITY parity, unsigned int stop)
 {
+    if(m_nFileUart > -1)
+        return true; //Already open
     open(m_sDeviceName.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);		//Open in non blocking read/write mode
 	if(m_nFileUart == -1)
         return false;
@@ -70,6 +72,11 @@ void UART::Close()
     m_nFileUart = -1;
 }
 
+bool UART::IsOpen()
+{
+    return (m_nFileUart > -1);
+}
+
 void UART::UpdateSettings()
 {
     if(m_nFileUart < 0)
@@ -84,6 +91,13 @@ void UART::UpdateSettings()
 	options.c_lflag = 0;
 	//Apply the change to the terminal with immediate effect (TCSANOW)
 	tcsetattr(m_nFileUart, TCSANOW, &options);
+}
+
+bool UART::Send(unsigned char byte)
+{
+    if(m_nFileUart < 0)
+        return false;
+    return (write(m_nFileUart, &byte, 1) == 1);
 }
 
 int UART::Send(unsigned char* buffer, size_t size)
