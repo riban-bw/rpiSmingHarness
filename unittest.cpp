@@ -34,16 +34,11 @@ unsigned int UnitTest::GetSteps()
     return m_nSteps;
 }
 
-bool UnitTest::RunStep(unsigned int step)
-{
-    return true;
-}
-
 bool UnitTest::Run()
 {
     StartTest();
-    for(unsigned int nStep = 0; nStep < m_nSteps; ++nStep)
-        m_bPass &= RunStep(nStep);
+    for(vector<UnitTest::TestStep>::iterator it = m_vSteps.begin(); it != m_vSteps.end(); ++it)
+        m_bPass &= (this->*(*it))(); //Call each step's function as defined in vector of step functions and add result to overall result
     return EndTest();
 }
 

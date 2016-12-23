@@ -15,7 +15,7 @@ using namespace std;
 
 /** @brief  Abstract class providing framework for unit tests within the espRpiHarness application
 *   @note   Each test has a name which may be called by the application running on the ESP module via its serial connection to the RPi
-*   @note   Each test may have several steps. These steps may be requested individually but the common workflow is to call Run() function to run all steps.
+*   @note   Each test may have several steps. Call Run() function to run all steps.
 *   @note   The derived class should add a function for each step and add a pointer to each of these step functions using AddStep(*function).
 */
 class UnitTest
@@ -38,12 +38,6 @@ class UnitTest
         *   @return <i>unsigned int</i> Quantity of steps
         */
         unsigned int GetSteps();
-
-        /** @brief  Runs specified step
-        *   @param  test Index of the step to run [0,1,...] (Default: 0 (first step))
-        *   @return <i>bool</i> True on success
-        */
-        virtual bool RunStep(unsigned int test = 0);
 
         /** @brief  Runs all tests
         *   @return <i>bool</i> True on success
